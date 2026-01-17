@@ -1,11 +1,9 @@
 #include <iostream>
 #include <string>
-#include <vector>
 #include <map>
 #include <Windows.h>
 #include "defines.h"
 #include "scanner.h"
-#include "diagram.h"
 
 std::map <int, std::string> lex_type_names{
     {10,    "IDENT"},
@@ -79,8 +77,8 @@ int main(int argc, char** argv) {
     do {
         tok = sc.getNextLex(lex);
         pos = sc.getLineCol();
-        std::cout << "[" << pos.first << ", " << pos.second << "]\ttype = " << get_lex_name_by_type(tok) << "\t\tlex = " << lex << std::endl;
-    } while (tok != 100);
+        std::cout << "[" << pos.first << ", " << pos.second << "]\ttype = " << get_lex_name_by_type(tok) << "\tlex = " << lex << std::endl;
+    } while (tok != T_END);
 
 
     std::cout << "\nПрограмма завершена. Нажмите Enter для выхода...";
