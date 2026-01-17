@@ -1,0 +1,7 @@
+const int N = 10;
+
+int main() {
+    short a = 5;
+    int b = 20;
+    bool flag = true;
+}
