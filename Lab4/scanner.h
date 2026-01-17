@@ -25,7 +25,6 @@ public:
     int getNextLex(std::string& out_lex);
     std::pair<int, int> getLineCol() const;
 
-    // Ќовые методы дл€ сохранени€/восстановлени€ позиции
     size_t savePosition() const { return current_pos; }
     void restorePosition(size_t pos) { current_pos = pos; }
 };

@@ -3,7 +3,6 @@
 // Идентификаторы
 #define IDENT                10
 
-// Ключевые слова
 #define KW_SHORT             1
 #define KW_INT               2
 #define KW_LONG              3
@@ -13,12 +12,11 @@
 #define KW_FALSE             7
 #define KW_CONST             8
 
-// Константы
+// Конс
 #define CONST_DEC            20
 #define CONST_HEX            21
 #define CONST_BOOL           22
 
-// Специальные знаки / разделители
 #define SEMI                 30
 #define COMMA                31
 #define LPAREN               32
@@ -28,7 +26,7 @@
 #define LBRACKET             36
 #define RBRACKET             37
 
-// Операторы
+// Оп
 #define EQ                   40
 #define NEQ                  41
 #define LE                   42
@@ -43,12 +41,13 @@
 #define DIV                  50
 #define MOD                  51
 
-// Побитовые операторы
+// Поб
 #define BIT_AND              52
 #define BIT_OR               53
 #define BIT_XOR              54
 #define BIT_NOT              57
 
-// Прочие
+// Проч
 #define T_END                100
 #define T_ERR                200
+
