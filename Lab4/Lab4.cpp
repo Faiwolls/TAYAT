@@ -4,6 +4,7 @@
 #include <Windows.h>
 #include "defines.h"
 #include "scanner.h"
+#include "diagram.h"
 
 std::map <int, std::string> lex_type_names{
     {10,    "IDENT"},
@@ -70,15 +71,24 @@ int main(int argc, char** argv) {
         return -1;
     }
 
-    std::cout << "ËÅÊÑÈ×ÅÑÊÈÉ ÀÍÀËÈÇ " << fname << "\n" << std::endl;
-    std::string lex;
-    int tok;
-    std::pair<int, int> pos;
-    do {
-        tok = sc.getNextLex(lex);
-        pos = sc.getLineCol();
-        std::cout << "[" << pos.first << ", " << pos.second << "]\ttype = " << get_lex_name_by_type(tok) << "\tlex = " << lex << std::endl;
-    } while (tok != T_END);
+    //std::cout << "ËÅÊÑÈ×ÅÑÊÈÉ ÀÍÀËÈÇ " << fname << "\n" << std::endl;
+    //std::string lex;
+    //int tok;
+    //std::pair<int, int> pos;
+    //do {
+    //    tok = sc.getNextLex(lex);
+    //    pos = sc.getLineCol();
+    //    std::cout << "[" << pos.first << ", " << pos.second << "]\ttype = " << get_lex_name_by_type(tok) << "\tlex = " << lex << std::endl;
+    //} while (tok != T_END);
+
+    Diagram diagram(&sc);
+
+    try {
+        diagram.ParseProgram();
+        std::cout << "Îøèáîê íå îáíàðóæåíî" << std::endl;
+    }
+    catch (...) {}
+
 
 
     std::cout << "\nÏðîãðàììà çàâåðøåíà. Íàæìèòå Enter äëÿ âûõîäà...";
