@@ -11,6 +11,7 @@
 #define KW_TRUE              6
 #define KW_FALSE             7
 #define KW_CONST             8
+#define KW_RETURN			 9
 
 // Конс
 #define CONST_DEC            20

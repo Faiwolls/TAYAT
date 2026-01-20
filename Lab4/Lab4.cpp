@@ -89,6 +89,7 @@ int main(int argc, char** argv) {
     }
     catch (...) {}
 
+    
 
 
     std::cout << "\nПрограмма завершена. Нажмите Enter для выхода...";
