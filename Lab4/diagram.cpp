@@ -154,7 +154,19 @@ void Diagram::funcDecl() {
     }
     nextToken(); // LPAREN
 
-    
+    // Теперь добавляем функцию в дерево
+    dataDetails funcDetails = { false, retType, 0 };
+    try {
+        Node* funcNode = tree->addSymbol(Func, funcName, funcDetails, false, sc->getLineCol().first, sc->getLineCol().second);
+        // Сохраняем количество параметров
+        funcNode->paramCount = funcParams.size();
+    }
+    catch (const std::runtime_error& e) {
+        throw SemanticError(std::string("Семантическая ошибка: ") + e.what());
+    }
+
+    // Входим в область видимости функции
+    tree->enterScope(sc->getLineCol().first, sc->getLineCol().second);
 
     // Обрабатываем параметры
     t = peekToken();
@@ -210,19 +222,9 @@ void Diagram::funcDecl() {
     }
     nextToken(); // RPAREN
 
-    // Теперь добавляем функцию в дерево
-    dataDetails funcDetails = { false, retType, 0 };
-    try {
-        Node* funcNode = tree->addSymbol(Func, funcName, funcDetails, false, sc->getLineCol().first, sc->getLineCol().second);
-        // Сохраняем количество параметров
-        funcNode->paramCount = funcParams.size();
-    }
-    catch (const std::runtime_error& e) {
-        throw SemanticError(std::string("Семантическая ошибка: ") + e.what());
-    }
+    
 
-    // Входим в область видимости функции
-    tree->enterScope(sc->getLineCol().first, sc->getLineCol().second);
+    
 
     // Устанавливаем флаг, что мы внутри функции
     bool prevInFunction = inFunction;
@@ -375,12 +377,12 @@ void Diagram::block() {
     nextToken(); // LBRACE
 
     // Входим в новую область видимости
-    //tree->enterScope(sc->getLineCol().first, sc->getLineCol().second);
+    tree->enterScope(sc->getLineCol().first, sc->getLineCol().second);
 
     blockItems();
 
     // Выходим из области видимости
-    //tree->exitScope();
+    tree->exitScope();
 
     t = peekToken();
     if (t != RBRACE) {
