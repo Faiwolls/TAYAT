@@ -58,6 +58,8 @@ std::string get_lex_name_by_type(int type) {
     return lex_type_names[type];
 }
 
+
+
 int main(int argc, char** argv) {
     SetConsoleCP(1251);
     SetConsoleOutputCP(1251);
@@ -84,7 +86,7 @@ int main(int argc, char** argv) {
     Diagram diagram(&sc);
 
     try {
-        diagram.ParseProgram();
+        diagram.parseProgram();
         std::cout << "Ошибок не обнаружено" << std::endl;
     }
     catch (...) {}

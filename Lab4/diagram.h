@@ -4,6 +4,12 @@
 #include "defines.h"
 #include <string>
 #include <vector>
+#include <stdexcept>
+
+class SyntaxError : public std::runtime_error {
+public:
+    SyntaxError(const std::string& message) : std::runtime_error(message) {}
+};
 
 class Diagram {
 private:
@@ -14,30 +20,34 @@ private:
     std::string cur_lex;
 
     int nextToken();
-    int peekToken(int n);
+    int peekToken(int n = 1);
     void pushBack(int tok, const std::string& lex);
-    void lexError();
-    void synError(const std::string& msg);
 
-    void Program();
-    void TopDecl();
-    void FuncDecl();
-    void Params();
-    void Block();
-    void BlockItems();
-    void Stmt();
-    void WhileStmt();
-    void ReturnStmt();
-    void Expr();
-    void BitOr();
-    void BitXor();
-    void BitAnd();
-    void Rel();
-    void Add();
-    void Mul();
-    void Prim();
+    void syntaxError(const std::string& message);
+    void lexicalError();
+
+    // Синтаксические правила
+    void program();
+    void topDecl();
+    void funcDecl();
+    void constDecl();
+    void varDecl();
+    void params();
+    void block();
+    void blockItems();
+    void stmt();
+    void whileStmt();
+    void returnStmt();
+    void expr();
+    void rel();
+    void add();
+    void mul();
+    void bitOr();
+    void bitXor();
+    void bitAnd();
+    void prim();
 
 public:
     Diagram(Scanner* scanner);
-    void ParseProgram();
+    void parseProgram();
 };

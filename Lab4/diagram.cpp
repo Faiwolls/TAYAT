@@ -2,26 +2,29 @@
 #include "diagram.h"
 #include <iostream>
 #include <sstream>
-#include <vector>
 
-Diagram::Diagram(Scanner* scanner) : sc(scanner), cur_tok(0), cur_lex() {
+Diagram::Diagram(Scanner* scanner) : sc(scanner), cur_tok(0), cur_lex("") {
     push_tok.clear();
     push_lex.clear();
 }
 
-void Diagram::synError(const std::string& msg) {
-    std::pair<int, int> lc = sc->getLineCol();
-    std::cerr << "Синтаксическая ошибка: " << msg;
-    if (!cur_lex.empty()) std::cerr << " (около '" << cur_lex << "')";
-    std::cerr << std::endl << "(строка " << lc.first << ":" << lc.second << ")" << std::endl;
-    std::exit(1);
+void Diagram::syntaxError(const std::string& message) {
+    std::pair<int, int> pos = sc->getLineCol();
+    std::ostringstream oss;
+    oss << "Syntax Error at line " << pos.first << ", position " << pos.second
+        << ": " << message;
+    if (!cur_lex.empty()) {
+        oss << " (found: '" << cur_lex << "')";
+    }
+    throw SyntaxError(oss.str());
 }
 
-void Diagram::lexError() {
-    std::pair<int, int> lc = sc->getLineCol();
-    std::cerr << "Лексическая ошибка: неизвестная лексема '" << cur_lex << "'";
-    std::cerr << std::endl << "(строка " << lc.first << ":" << lc.second << ")" << std::endl;
-    std::exit(1);
+void Diagram::lexicalError() {
+    std::pair<int, int> pos = sc->getLineCol();
+    std::ostringstream oss;
+    oss << "Lexical Error at line " << pos.first << ", position " << pos.second
+        << ": unknown token '" << cur_lex << "'";
+    throw SyntaxError(oss.str());
 }
 
 int Diagram::nextToken() {
@@ -32,35 +35,37 @@ int Diagram::nextToken() {
         push_lex.pop_back();
         cur_tok = t;
         cur_lex = lx;
-        if (cur_tok == T_ERR) lexError();
+        if (cur_tok == T_ERR) lexicalError();
         return cur_tok;
     }
+
     std::string lex;
     cur_tok = sc->getNextLex(lex);
     cur_lex = lex;
-    if (cur_tok == T_ERR) lexError();
+    if (cur_tok == T_ERR) lexicalError();
     return cur_tok;
 }
 
-int Diagram::peekToken(int n = 1) {
+int Diagram::peekToken(int n) {
     std::vector<int> buf;
     std::vector<std::string> str_buf;
+
     for (int i = 0; i < n; i++) {
         int t = nextToken();
         buf.push_back(t);
         str_buf.push_back(cur_lex);
     }
-    int res;
-    res = buf.back();
+
+    int res = buf.back();
 
     for (int i = 0; i < n; i++) {
         int t = buf.back();
         std::string l = str_buf.back();
         pushBack(t, l);
-        if (!buf.empty()) buf.pop_back();
-        if (!str_buf.empty()) str_buf.pop_back();
+        buf.pop_back();
+        str_buf.pop_back();
     }
-    
+
     return res;
 }
 
@@ -69,398 +74,517 @@ void Diagram::pushBack(int tok, const std::string& lex) {
     push_lex.push_back(lex);
 }
 
-void Diagram::ParseProgram() {
-    Program();
-    //int t = peekToken();
-    //if (t != T_END) {
-    //    synError("Лишний текст в конце программы");
-    //}
+void Diagram::parseProgram() {
+    try {
+        std::cout << "=== Syntax Analysis ===" << std::endl;
+        program();
+        std::cout << "Syntax analysis completed: no errors found." << std::endl;
+        std::cout << "=======================" << std::endl;
+    }
+    catch (const SyntaxError& e) {
+        std::cerr << e.what() << std::endl;
+        throw;
+    }
 }
 
-void Diagram::Program() {
-    int t;
-    do {
-        t = peekToken();
-        if (t == T_END) { std::cout << "Конец файла" << std::endl; break; }
-        TopDecl();
-    } while (true);
+void Diagram::program() {
+    while (true) {
+        int t = peekToken();
+        if (t == T_END) {
+            break;
+        }
+        topDecl();
+    }
 }
 
-void Diagram::TopDecl() {
+void Diagram::topDecl() {
     int t = peekToken();
 
     if (t == KW_CONST) {
-        //Описание константы
-    }
-
-    if (t == KW_INT || t == KW_SHORT || t == KW_LONG || t == KW_BOOL) {
-        //Описание функции или переменной
-        int t2 = peekToken(2);
-        if (t2 != IDENT) { synError("Ожидался идентификатор после типа"); }
-
-        int t3 = peekToken(3);
-        if (t3 == LPAREN) {//Функция
-            FuncDecl();
+        nextToken(); // KW_CONST
+        t = peekToken();
+        if (t != KW_INT && t != KW_SHORT && t != KW_LONG && t != KW_BOOL) {
+            syntaxError("Expected type after 'const'");
         }
-        else { //Данные
-            std::cout << "DEBUG: Найдена переменная" << std::endl;
-            //Var();
+        nextToken(); // тип
+        t = peekToken();
+        if (t != IDENT) {
+            syntaxError("Expected identifier after type in constant declaration");
+        }
+        nextToken(); // IDENT
+        t = peekToken();
+        if (t != ASSIGN) {
+            syntaxError("Expected '=' after identifier in constant declaration");
+        }
+        nextToken(); // ASSIGN
+        expr();
+        t = peekToken();
+        if (t != SEMI) {
+            syntaxError("Expected ';' at the end of constant declaration");
+        }
+        nextToken(); // SEMI
+    }
+    else if (t == KW_INT || t == KW_SHORT || t == KW_LONG || t == KW_BOOL) {
+        if (peekToken(3) == LPAREN) {
+            funcDecl();
+        }
+        else {
+            varDecl();
         }
     }
     else {
-        synError("Ожидался тип в начале объявления");
+        syntaxError("Expected declaration at global scope");
     }
 }
 
-void Diagram::FuncDecl() {
-    nextToken(); //Тип
-    nextToken(); //Имя функции
-    nextToken(); // '('
-
+void Diagram::funcDecl() {
+    nextToken(); // тип возвращаемого значения
     int t = peekToken();
+    if (t != IDENT) {
+        syntaxError("Expected function name after return type");
+    }
+    nextToken(); // IDENT
+
+    t = peekToken();
+    if (t != LPAREN) {
+        syntaxError("Expected '(' after function name");
+    }
+    nextToken(); // LPAREN
+
+    t = peekToken();
     if (t != RPAREN) {
-        Params();
+        params();
     }
 
     t = peekToken();
     if (t != RPAREN) {
-        synError("Ожидалась ')' после параметров функции");
+        syntaxError("Expected ')' after function parameters");
     }
-    nextToken(); // ')'
+    nextToken(); // RPAREN
 
-    Block(); // тело функции
+    block();
 }
 
-void Diagram::Params() {
+void Diagram::constDecl() {
+    nextToken(); // KW_CONST
+
+    // Проверяем тип константы
     int t = peekToken();
-    if (t == KW_INT || t == KW_SHORT || t == KW_LONG || t == KW_BOOL) {
-        nextToken(); // тип параметра
+    if (t != KW_INT && t != KW_SHORT && t != KW_LONG && t != KW_BOOL) {
+        syntaxError("Ожидался тип после ключевого слова 'const'");
+    }
+    nextToken(); // тип
+
+    t = peekToken();
+    if (t != IDENT) {
+        syntaxError("Ожидался идентификатор после типа в объявлении константы");
+    }
+    nextToken(); // идентификатор
+
+    t = peekToken();
+    if (t != ASSIGN) {
+        syntaxError("Ожидался символ '=' после идентификатора в объявлении константы");
+    }
+    nextToken(); // '='
+
+    expr(); // выражение для инициализации константы
+
+    t = peekToken();
+    if (t != SEMI) {
+        syntaxError("Ожидалась ';' в конце объявления константы");
+    }
+    nextToken(); // ';'
+}
+
+void Diagram::varDecl() {
+    nextToken(); // тип переменной
+
+    while (true) {
+        int t = peekToken();
+        if (t != IDENT) {
+            syntaxError("Ожидался идентификатор переменной");
+        }
+        nextToken(); // имя переменной
+
+        // Проверка на массивы (необязательно по требованиям, но может быть)
+        t = peekToken();
+        if (t == LBRACKET) {
+            nextToken(); // '['
+            expr(); // размер массива
+            t = peekToken();
+            if (t != RBRACKET) {
+                syntaxError("Ожидалась ']' после размера массива");
+            }
+            nextToken(); // ']'
+        }
+
+        // Проверка на инициализацию
+        t = peekToken();
+        if (t == ASSIGN) {
+            nextToken(); // '='
+            expr(); // значение для инициализации
+        }
+
+        t = peekToken();
+        if (t != COMMA) {
+            break; // больше нет переменных для объявления
+        }
+        nextToken(); // ','
+    }
+
+    int t = peekToken();
+    if (t != SEMI) {
+        syntaxError("Ожидалась ';' в конце объявления переменной");
+    }
+    nextToken(); // ';'
+}
+
+void Diagram::params() {
+    while (true) {
+        int t = peekToken();
+        if (t != KW_INT && t != KW_SHORT && t != KW_LONG && t != KW_BOOL) {
+            syntaxError("Expected parameter type");
+        }
+        nextToken(); // тип
+
         t = peekToken();
         if (t != IDENT) {
-            synError("Ожидался идентификатор параметра");
+            syntaxError("Expected parameter name");
         }
-        nextToken(); // имя параметра
+        nextToken(); // имя
 
         t = peekToken();
-        while (t == COMMA) {
-            nextToken(); // запятая
-            t = peekToken();
-            if (t != KW_INT && t != KW_SHORT && t != KW_LONG && t != KW_BOOL) {
-                synError("Ожидался тип параметра после ','");
-            }
-            nextToken(); // тип параметра
-            t = peekToken();
-            if (t != IDENT) {
-                synError("Ожидался идентификатор параметра");
-            }
-            nextToken(); // имя параметра
-            t = peekToken();
+        if (t != COMMA) {
+            break;
         }
+        nextToken(); // COMMA
     }
 }
 
-void Diagram::Block() {
+void Diagram::block() {
     int t = peekToken();
     if (t != LBRACE) {
-        synError("Ожидалась '{' для начала блока");
+        syntaxError("Expected '{' to start block");
     }
-    nextToken(); // '{'
+    nextToken(); // LBRACE
 
-    BlockItems();
+    blockItems();
 
     t = peekToken();
     if (t != RBRACE) {
-        synError("Ожидалась '}' для конца блока");
+        syntaxError("Expected '}' to end block");
     }
-    nextToken(); // '}'
+    nextToken(); // RBRACE
 }
 
-void Diagram::BlockItems() {
-    int t = peekToken();
-    while (t != RBRACE && t != T_END) {
+void Diagram::blockItems() {
+    while (true) {
+        int t = peekToken();
+        if (t == RBRACE || t == T_END) {
+            break;
+        }
+
         if (t == KW_INT || t == KW_SHORT || t == KW_LONG || t == KW_BOOL) {
-            
             nextToken(); // тип
+
             while (true) {
                 t = peekToken();
                 if (t != IDENT) {
-                    synError("Ожидался идентификатор переменной");
+                    syntaxError("Expected variable name");
                 }
                 nextToken(); // имя
 
                 t = peekToken();
-                if (t == LBRACKET) {
-                    nextToken(); // '['
-                    Expr(); // размер массива (любое выражение)
-                    t = peekToken();
-                    if (t != RBRACKET) {
-                        synError("Ожидалась ']' после размера массива");
-                    }
-                    nextToken(); // ']'
-                }
-
-                t = peekToken();
                 if (t == ASSIGN) {
-                    nextToken(); // '='
-                    Expr(); // инициализация
+                    nextToken(); // ASSIGN
+                    expr();
                 }
 
                 t = peekToken();
                 if (t != COMMA) {
                     break;
                 }
-                nextToken(); // ','
+                nextToken(); // COMMA
             }
 
             t = peekToken();
             if (t != SEMI) {
-                synError("Ожидалась ';' после объявления переменной");
+                syntaxError("Expected ';' after variable declaration");
             }
-            nextToken(); // ';'
+            nextToken(); // SEMI
         }
         else {
-            Stmt();
+            stmt();
         }
-        t = peekToken();
     }
 }
 
-void Diagram::Stmt() {
+void Diagram::stmt() {
     int t = peekToken();
+
     if (t == SEMI) {
         nextToken(); // пустой оператор
         return;
     }
+
     if (t == LBRACE) {
-        Block(); // составной оператор
+        block(); // составной оператор
         return;
     }
+
     if (t == KW_WHILE) {
-        nextToken(); // while
-        WhileStmt();
+        nextToken(); // KW_WHILE
+        whileStmt();
         return;
     }
+
     if (t == KW_RETURN) {
-        nextToken(); // return
-        ReturnStmt();
+        nextToken(); // KW_RETURN
+        returnStmt();
         return;
     }
+
     if (t == IDENT) {
-        nextToken(); // идентификатор
+        nextToken(); // IDENT
+
         t = peekToken();
         if (t == LPAREN) {
             // Вызов функции
-            nextToken(); // '('
+            nextToken(); // LPAREN
+
             t = peekToken();
             if (t != RPAREN) {
-                Expr(); // первый аргумент
+                expr(); // первый аргумент
+
                 t = peekToken();
                 while (t == COMMA) {
-                    nextToken(); // ','
-                    Expr(); // следующий аргумент
+                    nextToken(); // COMMA
+                    expr(); // следующий аргумент
                     t = peekToken();
                 }
             }
+
             if (t != RPAREN) {
-                synError("Ожидалась ')' после аргументов функции");
+                syntaxError("Expected ')' after function arguments");
             }
-            nextToken(); // ')'
+            nextToken(); // RPAREN
+
             t = peekToken();
             if (t != SEMI) {
-                synError("Ожидалась ';' после вызова функции");
+                syntaxError("Expected ';' after function call");
             }
-            nextToken(); // ';'
+            nextToken(); // SEMI
             return;
         }
-        else if (t == LBRACKET) {
+
+        if (t == LBRACKET) {
             // Индексация массива
-            nextToken(); // '['
-            Expr(); // индекс
+            nextToken(); // LBRACKET
+            expr(); // индекс
+
             t = peekToken();
             if (t != RBRACKET) {
-                synError("Ожидалась ']' после индекса");
+                syntaxError("Expected ']' after array index");
             }
-            nextToken(); // ']'
+            nextToken(); // RBRACKET
+
             t = peekToken();
+            if (t != ASSIGN) {
+                syntaxError("Expected '=' after array index");
+            }
         }
 
-        if (t == ASSIGN) {
-            // Присваивание
-            nextToken(); // '='
-            Expr(); // выражение
+        if (t == ASSIGN || peekToken() == ASSIGN) {
+            nextToken(); // ASSIGN
+            expr();
             t = peekToken();
             if (t != SEMI) {
-                synError("Ожидалась ';' после оператора присваивания");
+                syntaxError("Expected ';' after assignment");
             }
-            nextToken(); // ';'
+            nextToken(); // SEMI
             return;
         }
-        else {
-            synError("Ожидалось '=' или '(' после идентификатора");
-        }
+
+        syntaxError("Expected '(' for function call or '=' for assignment after identifier");
     }
-    synError("Неизвестная форма оператора");
+
+    syntaxError("Unexpected token in statement");
 }
 
-void Diagram::WhileStmt() {
+void Diagram::whileStmt() {
     int t = peekToken();
     if (t != LPAREN) {
-        synError("Ожидалась '(' после while");
+        syntaxError("Expected '(' after 'while'");
     }
-    nextToken(); // '('
+    nextToken(); // LPAREN
 
-    Expr(); // условие
+    expr(); // условие
 
     t = peekToken();
     if (t != RPAREN) {
-        synError("Ожидалась ')' после условия");
+        syntaxError("Expected ')' after while condition");
     }
-    nextToken(); // ')'
+    nextToken(); // RPAREN
 
-    Stmt(); // тело цикла
+    stmt(); // тело цикла
 }
 
-void Diagram::ReturnStmt() {
+void Diagram::returnStmt() {
     int t = peekToken();
     if (t != SEMI) {
-        Expr(); // возвращаемое значение
+        expr(); // возвращаемое значение
     }
+
     t = peekToken();
     if (t != SEMI) {
-        synError("Ожидалась ';' после оператора return");
+        syntaxError("Expected ';' after return statement");
     }
-    nextToken(); // ';'
+    nextToken(); // SEMI
 }
 
-void Diagram::Expr() {
-    BitOr();
+void Diagram::expr() {
+    rel();
     int t = peekToken();
     while (t == EQ || t == NEQ) {
         nextToken(); // оператор сравнения
-        BitOr();
+        rel();
         t = peekToken();
     }
 }
 
-void Diagram::BitOr() {
-    BitXor();
-    int t = peekToken();
-    while (t == BIT_OR) {
-        nextToken(); // '|'
-        BitXor();
-        t = peekToken();
-    }
-}
-
-void Diagram::BitXor() {
-    BitAnd();
-    int t = peekToken();
-    while (t == BIT_XOR) {
-        nextToken(); // '^'
-        BitAnd();
-        t = peekToken();
-    }
-}
-
-void Diagram::BitAnd() {
-    Rel();
-    int t = peekToken();
-    while (t == BIT_AND) {
-        nextToken(); // '&'
-        Rel();
-        t = peekToken();
-    }
-}
-
-void Diagram::Rel() {
-    Add();
+void Diagram::rel() {
+    add();
     int t = peekToken();
     while (t == LT || t == LE || t == GT || t == GE) {
-        nextToken(); // оператор сравнения
-        Add();
+        nextToken(); // оператор отношения
+        add();
         t = peekToken();
     }
 }
 
-void Diagram::Add() {
-    Mul();
+void Diagram::add() {
+    mul();
     int t = peekToken();
     while (t == PLUS || t == MINUS) {
         nextToken(); // '+' или '-'
-        Mul();
+        mul();
         t = peekToken();
     }
 }
 
-void Diagram::Mul() {
-    Prim();
+void Diagram::mul() {
+    bitOr();
     int t = peekToken();
     while (t == MULT || t == DIV || t == MOD) {
         nextToken(); // '*' '/' или '%'
-        Prim();
+        bitOr();
         t = peekToken();
     }
 }
 
-void Diagram::Prim() {
+void Diagram::bitOr() {
+    bitXor();
     int t = peekToken();
+    while (t == BIT_OR) {
+        nextToken(); // '|'
+        bitXor();
+        t = peekToken();
+    }
+}
+
+void Diagram::bitXor() {
+    bitAnd();
+    int t = peekToken();
+    while (t == BIT_XOR) {
+        nextToken(); // '^'
+        bitAnd();
+        t = peekToken();
+    }
+}
+
+void Diagram::bitAnd() {
+    prim();
+    int t = peekToken();
+    while (t == BIT_AND) {
+        nextToken(); // '&'
+        prim();
+        t = peekToken();
+    }
+}
+
+void Diagram::prim() {
+    int t = peekToken();
+
     if (t == KW_TRUE || t == KW_FALSE) {
         nextToken(); // логическая константа
         return;
     }
+
     if (t == CONST_DEC || t == CONST_HEX) {
         nextToken(); // числовая константа
         return;
     }
+
     if (t == LPAREN) {
         nextToken(); // '('
-        Expr();
+        expr();
+
         t = peekToken();
         if (t != RPAREN) {
-            synError("Ожидалась ')' после выражения");
+            syntaxError("Expected ')' after expression");
         }
         nextToken(); // ')'
         return;
     }
+
     if (t == IDENT) {
         nextToken(); // идентификатор
+
         t = peekToken();
-        if (t == LBRACKET) {
-            // Индексация массива
-            nextToken(); // '['
-            Expr(); // индекс
-            t = peekToken();
-            if (t != RBRACKET) {
-                synError("Ожидалась ']' после индекса");
-            }
-            nextToken(); // ']'
-            return;
-        }
-        else if (t == LPAREN) {
+        if (t == LPAREN) {
             // Вызов функции
             nextToken(); // '('
+
             t = peekToken();
             if (t != RPAREN) {
-                Expr(); // первый аргумент
+                expr(); // первый аргумент
+
                 t = peekToken();
                 while (t == COMMA) {
                     nextToken(); // ','
-                    Expr(); // следующий аргумент
+                    expr(); // следующий аргумент
                     t = peekToken();
                 }
             }
+
             if (t != RPAREN) {
-                synError("Ожидалась ')' после аргументов");
+                syntaxError("Expected ')' after function arguments");
             }
             nextToken(); // ')'
             return;
         }
+
+        if (t == LBRACKET) {
+            // Индексация массива
+            nextToken(); // '['
+            expr(); // индекс
+
+            t = peekToken();
+            if (t != RBRACKET) {
+                syntaxError("Expected ']' after array index");
+            }
+            nextToken(); // ']'
+            return;
+        }
+
         return;
     }
-    if (t == MINUS) {
-        nextToken(); // унарный минус
-        Prim();
+
+    if (t == MINUS || t == PLUS) {
+        nextToken(); // унарный минус или плюс
+        prim();
         return;
     }
-    synError("Ожидалось первичное выражение");
+
+    syntaxError("Expected primary expression");
 }

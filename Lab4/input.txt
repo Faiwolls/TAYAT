@@ -1,1 +1,28 @@
-int N() {}
+const int MAX_COUNT = 10;
+const bool ENABLE_LOG = false;
+
+int calculate_sum(int start, int end) {
+    int sum = 0;
+    int i = start;
+    
+    while (i <= end) {
+        sum = sum + i;
+        i = i + 1;
+    }
+    
+    //return sum;
+}
+
+bool is_power_of_two(int n) {
+    //return (n > 0) && ((n & (n - 1)) == 0);
+}
+
+int main() {
+    int total = calculate_sum(1, MAX_COUNT);
+    
+    ;;;;
+    
+    bool flag = is_power_of_two(total);
+    
+    
+}
