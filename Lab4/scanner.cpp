@@ -62,6 +62,7 @@ int Scanner::checkKeyword(const std::string& s) {
     if (s == "true") return KW_TRUE;
     if (s == "false") return KW_FALSE;
     if (s == "const") return KW_CONST;
+    if (s == "return") return KW_RETURN;
     return IDENT;
 }
 
@@ -172,12 +173,14 @@ int Scanner::getNextLex(std::string& out_lex) {
         case '<':
             getChar();
             if (peek() == '=') { getChar(); out_lex = "<="; token = LE; break; }
+            if (peek() == '<') { getChar(); out_lex = "<<"; token = BIT_LEFT; break; }
             out_lex = "<"; token = LT;
             break;
 
         case '>':
             getChar();
             if (peek() == '=') { getChar(); out_lex = ">="; token = GE; break; }
+            if (peek() == '>') { getChar(); out_lex = ">>"; token = BIT_RIGHT; break; }
             out_lex = ">"; token = GT;
             break;
 
