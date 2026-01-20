@@ -44,6 +44,7 @@ public:
     // Конструкторы
     Node(nodeType k);
     Node(nodeType k, const std::string& name, dataDetails details, bool isConst, int line, int pos);
+
     ~Node();
 };
 
@@ -52,9 +53,6 @@ private:
     Node* root;    // корень дерева (глобальная область видимости)
     Node* current; // текущая область видимости
 
-    
-
-    // Вспомогательные методы
     void addChild(Node* parent, Node* child);
     Node* findInScope(Node* scope, const std::string& name) const;
     void printRec(const Node* node, int indent) const;

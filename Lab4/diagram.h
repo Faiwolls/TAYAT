@@ -23,8 +23,6 @@ private:
     dataType currentReturnType;
     std::string currentFuncName;
     dataType currentFuncReturnType;
-
-    // Хранение информации о параметрах функций
     std::unordered_map<std::string, std::vector<dataDetails>> functionParams;
 
     int nextToken();

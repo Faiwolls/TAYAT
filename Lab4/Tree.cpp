@@ -19,11 +19,8 @@ Node::Node(nodeType k, const std::string& name, dataDetails details,
 {
 }
 
-Node::~Node() {
-    // Деструктор не удаляет дочерние узлы, так как это делает Tree
-}
+Node::~Node() {}
 
-// Реализация Tree
 Tree::Tree() {
     root = new Node(Scope);
     root->name = "<root>";
@@ -45,7 +42,6 @@ Tree::~Tree() {
     current = nullptr;
 }
 
-// Вспомогательный метод для добавления дочернего узла
 void Tree::addChild(Node* parent, Node* child) {
     if (!parent || !child) return;
     child->parent = parent;

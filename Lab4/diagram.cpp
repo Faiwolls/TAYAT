@@ -1,10 +1,9 @@
-// diagram.cpp (исправленная версия)
+// diagram.cpp
 #include "diagram.h"
 #include <iostream>
 #include <sstream>
 #include <functional>
 
-// Добавляем класс для семантических ошибок
 class SemanticError : public std::exception {
 public:
     SemanticError(const std::string& message) : msg(message) {}
@@ -81,9 +80,7 @@ void Diagram::pushBack(int tok, const std::string& lex) {
 
 void Diagram::parseProgram() {
     try {
-        std::cout << "=== Синтаксический анализ ===" << std::endl;
         program();
-        std::cout << "Синтаксический анализ завершен: ошибок не найдено." << std::endl;
         tree->print();
         std::cout << "===============================" << std::endl;
     }
@@ -143,7 +140,7 @@ void Diagram::funcDecl() {
     nextToken();
     std::string funcName = cur_lex;
 
-    // Сохраняем информацию о функции (добавим в дерево после параметров)
+    // Сохраняем информацию о функции
     currentFuncName = funcName;
     currentFuncReturnType = retType;
     std::vector<dataDetails> funcParams;
@@ -221,10 +218,6 @@ void Diagram::funcDecl() {
         syntaxError("Ожидался ')' после параметров функции");
     }
     nextToken(); // RPAREN
-
-    
-
-    
 
     // Устанавливаем флаг, что мы внутри функции
     bool prevInFunction = inFunction;
