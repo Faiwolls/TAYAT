@@ -2,9 +2,11 @@
 #pragma once
 #include "scanner.h"
 #include "defines.h"
+#include "tree.h"
 #include <string>
 #include <vector>
 #include <stdexcept>
+#include <unordered_map>
 class SyntaxError : public std::runtime_error {
 public:
     SyntaxError(const std::string& message) : std::runtime_error(message) {}
@@ -12,11 +14,18 @@ public:
 class Diagram {
 private:
     Scanner* sc;
+    Tree* tree;
     std::vector<int> push_tok;
     std::vector<std::string> push_lex;
     int cur_tok;
     std::string cur_lex;
     bool inFunction;
+    dataType currentReturnType;
+    std::string currentFuncName;
+    dataType currentFuncReturnType;
+
+    // Хранение информации о параметрах функций
+    std::unordered_map<std::string, std::vector<dataDetails>> functionParams;
 
     int nextToken();
     int peekToken(int n = 1);
@@ -36,15 +45,16 @@ private:
     void stmt();
     void whileStmt();
     void returnStmt();
-    void expr();
-    void rel();
-    void add();
-    void mul();
-    void bitOr();
-    void bitXor();
-    void bitAnd();
-    void shift();
-    void prim();
+
+    dataDetails expr();
+    dataDetails rel();
+    dataDetails add();
+    dataDetails mul();
+    dataDetails bitOr();
+    dataDetails bitXor();
+    dataDetails bitAnd();
+    dataDetails shift();
+    dataDetails prim();
 
 public:
     Diagram(Scanner* scanner);

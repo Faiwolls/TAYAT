@@ -1,34 +1,42 @@
-const long BIT_MASK = 0xFFFF;
-const int HEX_CONSTANT = 0x1A;
-
-short bitwise_operations(short a, short b) {
-    short and_result = a & b;
-    short or_result = a | b;
-    short xor_result = a ^ b;
-    
-    return and_result | or_result | xor_result;
+// Функция вычисления факториала
+int factorial(int n) {
+    int result = 1;
+    int i = 1;
+    //while (i <= n) {
+    //    result = result * i;
+    //    i = i + 1;
+    //}
+    return result;
 }
 
-long complex_calculation(long value) {
-    long temp = value;
-    int counter = 0;
-    
-    while ((temp & BIT_MASK) != 0) {
-        temp = temp >> 4;
-        counter = counter + 1;
+// Функция проверки простоты числа
+bool is_prime(int z) {
+    int divisor = 2;
+    while (divisor * divisor <= n) {
+        
+        divisor = divisor + 1;
     }
     
-    return counter;
+    return true;
 }
 
 int main() {
-    short num1 = 0x1010;
-    short num2 = 0x1100;
+    const int N = 10;
+    int sum_factorials = 0;
+    int prime_count = 0;
+    int i = 0;
     
-    short result = bitwise_operations(num1, num2);
+    while (i <= N) {
+        int fact = factorial(i);
+        sum_factorials = sum_factorials + fact;
+        
+        
+        
+        i = i + 1;
+    }
     
-    long long_value = 0xFFFFFFFF;
-    long calc_result = complex_calculation(long_value);
+    // Комбинированная операция
+    int final_result = (sum_factorials & 0xFF) | (prime_count << 8);
     
-    return (result + calc_result);
+    return final_result;
 }

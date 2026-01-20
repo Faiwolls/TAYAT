@@ -39,6 +39,7 @@ public:
     bool isConst;
     int line; // строка в исходном коде
     int pos;  // позиция в строке
+    int paramCount = 0;
 
     // Конструкторы
     Node(nodeType k);
@@ -50,6 +51,8 @@ class Tree {
 private:
     Node* root;    // корень дерева (глобальная область видимости)
     Node* current; // текущая область видимости
+
+    
 
     // Вспомогательные методы
     void addChild(Node* parent, Node* child);
