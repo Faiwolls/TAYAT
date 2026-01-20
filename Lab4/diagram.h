@@ -5,12 +5,10 @@
 #include <string>
 #include <vector>
 #include <stdexcept>
-
 class SyntaxError : public std::runtime_error {
 public:
     SyntaxError(const std::string& message) : std::runtime_error(message) {}
 };
-
 class Diagram {
 private:
     Scanner* sc;
@@ -18,11 +16,11 @@ private:
     std::vector<std::string> push_lex;
     int cur_tok;
     std::string cur_lex;
+    bool inFunction;
 
     int nextToken();
     int peekToken(int n = 1);
     void pushBack(int tok, const std::string& lex);
-
     void syntaxError(const std::string& message);
     void lexicalError();
 
@@ -45,6 +43,7 @@ private:
     void bitOr();
     void bitXor();
     void bitAnd();
+    void shift();
     void prim();
 
 public:

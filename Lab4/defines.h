@@ -13,7 +13,7 @@
 #define KW_CONST             8
 #define KW_RETURN			 9
 
-// Конс
+// Константы
 #define CONST_DEC            20
 #define CONST_HEX            21
 #define CONST_BOOL           22
@@ -27,7 +27,7 @@
 #define LBRACKET             36
 #define RBRACKET             37
 
-// Оп
+// Операторы
 #define EQ                   40
 #define NEQ                  41
 #define LE                   42
@@ -42,13 +42,15 @@
 #define DIV                  50
 #define MOD                  51
 
-// Поб
+// Побитовые
 #define BIT_AND              52
 #define BIT_OR               53
 #define BIT_XOR              54
 #define BIT_NOT              57
+#define BIT_LEFT			 58
+#define BIT_RIGHT			 59
 
-// Проч
+// Прочие
 #define T_END                100
 #define T_ERR                200
 

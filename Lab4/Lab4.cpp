@@ -17,6 +17,7 @@ std::map <int, std::string> lex_type_names{
     { 6,     "KW_TRUE" },
     { 7,     "KW_FALSE" },
     { 8,     "KW_CONST" },
+    { 9,     "KW_RETURN" },
 
     { 20,    "CONST_DEC" },
     { 21,    "CONST_HEX" },
@@ -49,6 +50,8 @@ std::map <int, std::string> lex_type_names{
     { 53,    "BIT_OR" },
     { 54,    "BIT_XOR" },
     { 57,    "BIT_NOT" },
+    { 58,    "BIT_LEFT" },
+    { 57,    "BIT_RIGHT" },
 
     { 100,   "T_END" },
     { 200,   "T_ERR" }
@@ -58,13 +61,11 @@ std::string get_lex_name_by_type(int type) {
     return lex_type_names[type];
 }
 
-
-
 int main(int argc, char** argv) {
     SetConsoleCP(1251);
     SetConsoleOutputCP(1251);
 
-    std::string fname = "input.txt";
+    std::string fname = "input1.txt";
     if (argc > 1) fname = argv[1];
 
     Scanner sc;
@@ -73,16 +74,6 @@ int main(int argc, char** argv) {
         return -1;
     }
 
-    //std::cout << "ЛЕКСИЧЕСКИЙ АНАЛИЗ " << fname << "\n" << std::endl;
-    //std::string lex;
-    //int tok;
-    //std::pair<int, int> pos;
-    //do {
-    //    tok = sc.getNextLex(lex);
-    //    pos = sc.getLineCol();
-    //    std::cout << "[" << pos.first << ", " << pos.second << "]\ttype = " << get_lex_name_by_type(tok) << "\tlex = " << lex << std::endl;
-    //} while (tok != T_END);
-
     Diagram diagram(&sc);
 
     try {
@@ -90,9 +81,6 @@ int main(int argc, char** argv) {
         std::cout << "Ошибок не обнаружено" << std::endl;
     }
     catch (...) {}
-
-    
-
 
     std::cout << "\nПрограмма завершена. Нажмите Enter для выхода...";
     std::cin.ignore();

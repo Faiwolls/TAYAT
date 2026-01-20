@@ -1,28 +1,34 @@
-const int MAX_COUNT = 10;
-const bool ENABLE_LOG = false;
+const long BIT_MASK = 0xFFFF;
+const int HEX_CONSTANT = 0x1A;
 
-int calculate_sum(int start, int end) {
-    int sum = 0;
-    int i = start;
+short bitwise_operations(short a, short b) {
+    short and_result = a & b;
+    short or_result = a | b;
+    short xor_result = a ^ b;
     
-    while (i <= end) {
-        sum = sum + i;
-        i = i + 1;
-    }
-    
-    //return sum;
+    return and_result | or_result | xor_result;
 }
 
-bool is_power_of_two(int n) {
-    //return (n > 0) && ((n & (n - 1)) == 0);
+long complex_calculation(long value) {
+    long temp = value;
+    int counter = 0;
+    
+    while ((temp & BIT_MASK) != 0) {
+        temp = temp >> 4;
+        counter = counter + 1;
+    }
+    
+    return counter;
 }
 
 int main() {
-    int total = calculate_sum(1, MAX_COUNT);
+    short num1 = 0x1010;
+    short num2 = 0x1100;
     
-    ;;;;
+    short result = bitwise_operations(num1, num2);
     
-    bool flag = is_power_of_two(total);
+    long long_value = 0xFFFFFFFF;
+    long calc_result = complex_calculation(long_value);
     
-    
+    return (result + calc_result);
 }
