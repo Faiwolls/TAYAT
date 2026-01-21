@@ -1,42 +1,12 @@
-// Функция вычисления факториала
-int factorial(int n) {
-    int result = 1;
-    int i = 1;
-    while (i <= n) {
-        result = result * i;
-        i = i + 1;
-    }
-    return result;
-}
-
-// Функция проверки простоты числа
-bool is_prime(int n) {
-    int divisor = 2;
-    while (divisor * divisor <= n) {
-        
-        divisor = divisor + 1;
-    }
-    
-    return true;
-}
-
+// Ошибка: использование необъявленной переменной
 int main() {
-    const int N = 10;
-    int sum_factorials = 0;
-    int prime_count = 0;
-    int i = 0;
+    int x = 5;
+    y = x + 10; // Семантическая ошибка: 'y' не объявлена
     
-    while (i <= N) {
-        int fact = factorial(i);
-        sum_factorials = sum_factorials + fact;
-        
-        
-        
-        i = i + 1;
+    // Ошибка в условии while
+    while (undefinedVar > 0) { // 'undefinedVar' не объявлена
+        x = x - 1;
     }
     
-    // Комбинированная операция
-    int final_result = (sum_factorials & 0xFF) | (prime_count << 8);
-    
-    return final_result;
+    return 0;
 }

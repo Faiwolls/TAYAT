@@ -90,7 +90,7 @@ Node* Tree::addSymbol(nodeType type,
     Node* child = current->right;
     while (child) {
         if (child->type != Scope && child->name == name) {
-            throw runtime_error("Duplicate identifier '" + name + "'");
+            throw runtime_error("Повторяющийся идентификатор '" + name + "'");
         }
         child = child->left;
     }
@@ -160,20 +160,22 @@ void Tree::printRec(const Node* node, int indent) const {
 
     switch (node->type) {
     case Scope: cout << "[Scope]"; break;
-    case Var: cout << "Var "; break;
-    case Const: cout << "Const "; break;
-    case Func: cout << "Func "; break;
+    case Var: cout << "Variable "; break;
+    case Const: cout << "Constant "; break;
+    case Func: cout << "Function "; break;
     case Arr: cout << "Array "; break;
     default: cout << "Node "; break;
     }
 
     if (!node->name.empty()) {
-        cout << node->name;
+        if (node->type != Scope )cout << node->name;
     }
 
     // Вывод информации о типе
     if (node->type == Var || node->type == Const || node->type == Func || node->type == Arr) {
-        cout << " : ";
+        cout << " at [" << node->line << ":" << node->pos << "]";
+
+        cout << " type ";
         switch (node->details.type) {
         case t_int: cout << "int"; break;
         case t_short: cout << "short"; break;
@@ -189,8 +191,6 @@ void Tree::printRec(const Node* node, int indent) const {
         if (node->isConst) {
             cout << " (const)";
         }
-
-        cout << " [" << node->line << ":" << node->pos << "]";
     }
 
     cout << "\n";
@@ -203,6 +203,6 @@ void Tree::printRec(const Node* node, int indent) const {
 
 // Основной метод вывода дерева
 void Tree::print() const {
-    cout << "=== Semantic Tree ===\n";
+    cout << "СЕМАНТИЧЕСКОЕ ДЕРЕВО\n";
     printRec(root, 0);
 }
