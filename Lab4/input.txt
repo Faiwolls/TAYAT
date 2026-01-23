@@ -27,7 +27,7 @@ int main() {
     
     short result = bitwise_operations(num1, num2);
     
-    long long_value = 0xFFFFFFFF;
+    long long_value = 0xFFFFFFFFL;
     long calc_result = complex_calculation(long_value);
     
     return (result + calc_result);

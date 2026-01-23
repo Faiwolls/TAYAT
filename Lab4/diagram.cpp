@@ -465,7 +465,7 @@ void Diagram::prim() {
         nextToken(); // логическая константа
         return;
     }
-    if (t == CONST_DEC || t == CONST_HEX) {
+    if (t == CONST_DEC || t == CONST_HEX || t == CONST_HEX_LONG || t == CONST_DEC_LONG) {
         nextToken(); // числовая константа
         return;
     }

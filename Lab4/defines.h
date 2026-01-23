@@ -17,6 +17,8 @@
 #define CONST_DEC            20
 #define CONST_HEX            21
 #define CONST_BOOL           22
+#define CONST_DEC_LONG		 23
+#define CONST_HEX_LONG		 24
 
 #define SEMI                 30
 #define COMMA                31
