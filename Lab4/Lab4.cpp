@@ -74,8 +74,6 @@ int main(int argc, char** argv) {
         return -1;
     }
 
-    int xx = 555L;
-
     Diagram diagram(&sc);
 
     try {
