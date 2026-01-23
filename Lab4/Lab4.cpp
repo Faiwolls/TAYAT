@@ -64,6 +64,8 @@ int main(int argc, char** argv) {
     SetConsoleCP(1251);
     SetConsoleOutputCP(1251);
 
+    const long long_value = 0xFFFFFFFFL;
+
     std::string fname = "input1.txt";
     if (argc > 1) fname = argv[1];
 

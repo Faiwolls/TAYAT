@@ -277,6 +277,9 @@ void Diagram::blockItems() {
             }
             nextToken(); // SEMI
         }
+        else if (t == KW_CONST) {
+            constDecl(); 
+        }
         else {
             stmt();
         }

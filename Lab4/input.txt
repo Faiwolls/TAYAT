@@ -21,13 +21,15 @@ long complex_calculation(long value) {
     return counter;
 }
 
+const long long_value = 0xFFFFFFFFL;
+
 int main() {
     short num1 = 0x1010;
     short num2 = 0x1100;
     
     short result = bitwise_operations(num1, num2);
     
-    long long_value = 0xFFFFFFFFL;
+    const long long_value = 0xFFFFFFFFL;
     long calc_result = complex_calculation(long_value);
     
     return (result + calc_result);
