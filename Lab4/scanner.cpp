@@ -135,13 +135,22 @@ int Scanner::getNextLex(std::string& out_lex) {
                 while (isDigit(peek())) {
                     lex.push_back(getChar());
                 }
-                if (peek() == 'L' || peek() == 'l') { lex.push_back(getChar()); }
-                out_lex = lex;
-                token = (lex.length() > MAX_CONST_LEN) ? T_ERR : CONST_DEC;
+            
+                if (peek() == 'L' || peek() == 'l') {
+                    lex.push_back(getChar());
+                    out_lex = lex;
+                    token = (lex.length() > MAX_CONST_LEN) ? T_ERR : CONST_DEC_LONG;
+                }
+                else {
+                    out_lex = lex;
+                    token = (lex.length() > MAX_CONST_LEN) ? T_ERR : CONST_DEC;
+                }
             }
             else {
                 out_lex = "0";
                 token = CONST_DEC;
+                if (peek() == 'L' || peek() == 'l') { out_lex.push_back(getChar()); token = CONST_DEC_LONG; }
+                
             }
         }
         else {
@@ -150,9 +159,15 @@ int Scanner::getNextLex(std::string& out_lex) {
             while (isDigit(peek())) {
                 lex.push_back(getChar());
             }
-            if (peek() == 'L' || peek() == 'l') { lex.push_back(getChar()); }
-            out_lex = lex;
-            token = (lex.length() > MAX_CONST_LEN) ? T_ERR : CONST_DEC;
+            if (peek() == 'L' || peek() == 'l') {
+                lex.push_back(getChar());
+                out_lex = lex;
+                token = (lex.length() > MAX_CONST_LEN) ? T_ERR : CONST_DEC_LONG;
+            }
+            else {
+                out_lex = lex;
+                token = (lex.length() > MAX_CONST_LEN) ? T_ERR : CONST_DEC;
+            }
         }
     }
     else {
