@@ -119,6 +119,7 @@ int Scanner::getNextLex(std::string& out_lex) {
                     while (isHexDigit(peek())) {
                         lex.push_back(getChar());
                     }
+                    if (peek() == 'L') { lex.push_back(getChar()); }
                     out_lex = lex;
                     token = (lex.length() > MAX_CONST_LEN) ? T_ERR : CONST_HEX;
                 }
@@ -128,6 +129,7 @@ int Scanner::getNextLex(std::string& out_lex) {
                 while (isDigit(peek())) {
                     lex.push_back(getChar());
                 }
+                if (peek() == 'L') { lex.push_back(getChar()); }
                 out_lex = lex;
                 token = (lex.length() > MAX_CONST_LEN) ? T_ERR : CONST_DEC;
             }
@@ -142,6 +144,7 @@ int Scanner::getNextLex(std::string& out_lex) {
             while (isDigit(peek())) {
                 lex.push_back(getChar());
             }
+            if (peek() == 'L') { lex.push_back(getChar()); }
             out_lex = lex;
             token = (lex.length() > MAX_CONST_LEN) ? T_ERR : CONST_DEC;
         }
