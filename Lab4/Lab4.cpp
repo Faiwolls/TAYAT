@@ -20,6 +20,8 @@ std::map <int, std::string> lex_type_names{
     { 20,    "CONST_DEC" },
     { 21,    "CONST_HEX" },
     { 22,    "CONST_BOOL" },
+    { 23,    "CONST_DEC_LONG" },
+    { 24,    "CONST_HEX_LONG" },
 
     { 30,    "SEMI" },
     { 31,    "COMMA" },

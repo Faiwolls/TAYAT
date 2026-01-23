@@ -1,1 +1,1 @@
-long x = 0x222L;
+long x = 0x222z;
