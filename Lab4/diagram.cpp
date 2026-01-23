@@ -815,6 +815,10 @@ dataDetails Diagram::prim() {
         nextToken(); // числовая константа
         return { false, t_int, 0 };
     }
+    if (t == CONST_DEC_LONG || t == CONST_HEX_LONG) {
+        nextToken(); // числовая константа
+        return { false, t_long, 0 };
+    }
 
     // Выражение в скобках
     if (t == LPAREN) {

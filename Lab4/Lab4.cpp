@@ -17,11 +17,12 @@ std::map <int, std::string> lex_type_names{
     { 6,     "KW_TRUE" },
     { 7,     "KW_FALSE" },
     { 8,     "KW_CONST" },
-    { 9,     "KW_RETURN" },
 
     { 20,    "CONST_DEC" },
     { 21,    "CONST_HEX" },
     { 22,    "CONST_BOOL" },
+    { 23,    "CONST_DEC_LONG" },
+    { 24,    "CONST_HEX_LONG" },
 
     { 30,    "SEMI" },
     { 31,    "COMMA" },
@@ -50,8 +51,6 @@ std::map <int, std::string> lex_type_names{
     { 53,    "BIT_OR" },
     { 54,    "BIT_XOR" },
     { 57,    "BIT_NOT" },
-    { 58,    "BIT_LEFT" },
-    { 57,    "BIT_RIGHT" },
 
     { 100,   "T_END" },
     { 200,   "T_ERR" }
@@ -74,6 +73,8 @@ int main(int argc, char** argv) {
         std::cerr << "Невозможно открыть " << fname << std::endl;
         return -1;
     }
+
+    int xx = 555L;
 
     Diagram diagram(&sc);
 
