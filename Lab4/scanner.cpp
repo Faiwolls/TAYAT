@@ -20,6 +20,12 @@ bool Scanner::loadFile(const std::string& file_name) {
     return true;
 }
 
+void Scanner::loadFromString(const std::string& source) {
+    text = source;
+    text.push_back('\0');   // терминатор для корректного определения конца
+    current_pos = 0;
+}
+
 char Scanner::peek(size_t offset) const {
     size_t pos = current_pos + offset;
     return (pos < text.size()) ? text[pos] : '\0';

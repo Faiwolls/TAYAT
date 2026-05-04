@@ -22,6 +22,7 @@ private:
 public:
     Scanner();
     bool loadFile(const std::string& file_name);
+    void loadFromString(const std::string& source);
     int getNextLex(std::string& out_lex);
     std::pair<int, int> getLineCol() const;
 
